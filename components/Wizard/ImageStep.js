@@ -553,7 +553,7 @@ class ImageStep extends React.PureComponent {
             onChange={this.handleOSTreeRef}
             validated={ostreeRefValidated}
           />
-          {ostreeRefValidated === "default" && imageType === "rhel-edge-commit" && (
+          {ostreeRefValidated === "default" && imageType === "edge-commit" && (
             <p className="pf-c-form__helper-text" id="ostree-ref-input-helper-default" aria-live="polite">
               <FormattedMessage
                 defaultMessage="rhel/8/{arch}/edge is the default, where {arch} is determined by the host machine"
@@ -629,7 +629,7 @@ class ImageStep extends React.PureComponent {
             onChange={this.handleOSTreeRef}
             validated={ostreeRefValidated}
           />
-          {ostreeRefValidated === "default" && imageType === "rhel-edge-installer" && (
+          {ostreeRefValidated === "default" && imageType === "edge-installer" && (
             <p className="pf-c-form__helper-text" id="ostree-ref-input-helper-default" aria-live="polite">
               <FormattedMessage
                 defaultMessage="rhel/8/{arch}/edge is the default, where {arch} is determined by the host machine"
@@ -711,9 +711,9 @@ class ImageStep extends React.PureComponent {
           {imageType === "vhd" && azureProviderCheckbox}
           {imageType === "vmdk" && vmwareProviderCheckbox}
           {requiresImageSize(imageType) && imageSizeInput}
-          {(imageType === "fedora-iot-commit" || imageType === "rhel-edge-commit") && ostreeFields}
-          {imageType === "rhel-edge-container" && ostreeFields}
-          {imageType === "rhel-edge-installer" && ostreeInstallerFields}
+          {(imageType === "fedora-iot-commit" || imageType === "edge-commit") && ostreeFields}
+          {imageType === "edge-container" && ostreeFields}
+          {imageType === "edge-installer" && ostreeInstallerFields}
         </Form>
       </>
     );

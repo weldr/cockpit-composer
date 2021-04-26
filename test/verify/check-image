@@ -521,6 +521,8 @@ class TestLargeImage(composerlib.ComposerCase):
             image_type_ostree = "fedora-iot-commit"
         elif (distro == "rhel-8-3" or distro == "rhel-8-4"):
             image_type_ostree = "rhel-edge-commit"
+        elif (distro == "rhel-8-5"):
+            image_type_ostree = "edge-commit"
 
         self.login_and_go("/composer", superuser=True)
         b.wait_visible("#main")
@@ -595,7 +597,7 @@ class TestLargeImage(composerlib.ComposerCase):
         b = self.browser
         m = self.machine
 
-        image_type_ostree = "rhel-edge-container"
+        image_type_ostree = "edge-container"
 
         self.login_and_go("/composer", superuser=True)
         b.wait_visible("#main")
@@ -684,7 +686,7 @@ class TestLargeImage(composerlib.ComposerCase):
     def testOSTreeInstaller(self):
         b = self.browser
 
-        image_type_ostree = "rhel-edge-installer"
+        image_type_ostree = "edge-installer"
 
         self.login_and_go("/composer", superuser=True)
         b.wait_visible("#main")
