@@ -71,7 +71,7 @@ By default the cockpit-composer will be installed into `$TEST_OS`in [Makefile](M
 
 To test cockpit-composer in different OS, set the `$TEST_OS` environment variable, for example:
 
-    $ TEST_OS=fedora-32 make check
+    $ TEST_OS=fedora-33 make check
 
 ### Running eslint
 
