@@ -2,7 +2,7 @@
 VERSION=$(shell $(CURDIR)/rpmversion.sh | cut -d - -f 1)
 RELEASE=$(shell $(CURDIR)/rpmversion.sh | cut -d - -f 2)
 PACKAGE_NAME := $(shell awk '/"name":/ {gsub(/[",]/, "", $$2); print $$2}' package.json)
-TEST_OS ?= fedora-32
+TEST_OS ?= fedora-33
 export TEST_OS
 VM_IMAGE=$(CURDIR)/test/images/$(TEST_OS)
 ifneq (,$(wildcard ~/.config/codecov-token))
