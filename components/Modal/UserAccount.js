@@ -285,6 +285,7 @@ class UserAccount extends React.Component {
                     <label>
                       <input
                         type="checkbox"
+                        aria-label="Server admin checkbox"
                         checked={userAccount.groups.includes("wheel")}
                         onChange={(e) => this.handleChange(e, "admin")}
                       />
