@@ -148,7 +148,7 @@ class TestService(composerlib.ComposerCase):
         #     # Start button still there
         #     b.wait_visible("button:contains('Start')")
         # We expect multiple permission denied journal messages from the api calls
-        self.allow_journal_messages(".*: couldn't connect: Permission denied")
+        self.allow_journal_messages(".*: couldn't connect: Could not connect: Permission denied")
         # collect code coverage result
         self.check_coverage()
 

@@ -505,13 +505,6 @@ class TestImage(composerlib.ComposerCase):
         # collect code coverage result
         self.check_coverage()
 
-
-# these tests don't get along with just the standard 1.1GiB @nondestructive VMs
-@testlib.timeout(2400)
-@testlib.no_retry_when_changed
-class TestLargeImage(composerlib.ComposerCase):
-    provision = {"machine1": {"cpus": 2, "memory_mb": 2048}}
-
     def testOSTreeCommit(self):
         b = self.browser
         m = self.machine
@@ -579,12 +572,12 @@ class TestLargeImage(composerlib.ComposerCase):
         # test is temporarily disabled.
 
         # delete here
-        # b.click("#{}-actions".format(uuid))
-        # b.wait_attr("#{}-actions".format(uuid), "aria-expanded", "true")
-        # b.click("li[aria-labelledby={}] a:contains('Delete')".format(selector))
-        # b.wait_attr("#{}-actions".format(uuid), "aria-expanded", "false")
-        # b.click("#cmpsr-modal-delete button:contains('Delete image')")
-        # b.wait_not_present("#{}".format(selector))
+        b.click("#{}-actions".format(uuid))
+        b.wait_attr("#{}-actions".format(uuid), "aria-expanded", "true")
+        b.click("li[aria-labelledby={}] a:contains('Delete')".format(selector))
+        b.wait_attr("#{}-actions".format(uuid), "aria-expanded", "false")
+        b.click("#cmpsr-modal-delete button:contains('Delete image')")
+        b.wait_not_present("#{}".format(selector))
         self.allow_journal_messages(".*avc:  denied.*",
                                     ".*audit: .*seresult=denied .*")
         # collect code coverage result
@@ -669,12 +662,12 @@ class TestLargeImage(composerlib.ComposerCase):
         # test is temporarily disabled.
 
         # delete here
-        # b.click("#{}-actions".format(uuid))
-        # b.wait_attr("#{}-actions".format(uuid), "aria-expanded", "true")
-        # b.click("li[aria-labelledby={}] a:contains('Delete')".format(selector))
-        # b.wait_attr("#{}-actions".format(uuid), "aria-expanded", "false")
-        # b.click("#cmpsr-modal-delete button:contains('Delete image')")
-        # b.wait_not_present("#{}".format(selector))
+        b.click("#{}-actions".format(uuid))
+        b.wait_attr("#{}-actions".format(uuid), "aria-expanded", "true")
+        b.click("li[aria-labelledby={}] a:contains('Delete')".format(selector))
+        b.wait_attr("#{}-actions".format(uuid), "aria-expanded", "false")
+        b.click("#cmpsr-modal-delete button:contains('Delete image')")
+        b.wait_not_present("#{}".format(selector))
         self.allow_journal_messages(".*avc:  denied.*",
                                     ".*audit: .*seresult=denied .*")
         # collect code coverage result
@@ -794,12 +787,12 @@ class TestLargeImage(composerlib.ComposerCase):
         # test is temporarily disabled.
 
         # delete here
-        # b.click("#{}-actions".format(uuid))
-        # b.wait_attr("#{}-actions".format(uuid), "aria-expanded", "true")
-        # b.click("li[aria-labelledby={}] a:contains('Delete')".format(selector))
-        # b.wait_attr("#{}-actions".format(uuid), "aria-expanded", "false")
-        # b.click("#cmpsr-modal-delete button:contains('Delete image')")
-        # b.wait_not_present("#{}".format(selector))
+        b.click("#{}-actions".format(uuid))
+        b.wait_attr("#{}-actions".format(uuid), "aria-expanded", "true")
+        b.click("li[aria-labelledby={}] a:contains('Delete')".format(selector))
+        b.wait_attr("#{}-actions".format(uuid), "aria-expanded", "false")
+        b.click("#cmpsr-modal-delete button:contains('Delete image')")
+        b.wait_not_present("#{}".format(selector))
 
         # collect code coverage result
         self.check_coverage()

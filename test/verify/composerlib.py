@@ -8,7 +8,7 @@ import testlib
 
 # starting osbuild-composer.socket with no permission user will cause error[0-8]
 allowed_journal_messages = [
-    "http:///run/weldr/api.socket/api/v0/.* couldn't connect: Connection refused",
+    "http:///run/weldr/api.socket/api/v0/.* couldn't connect: Could not connect: Connection refused",
     "polkit-agent-helper-1: pam_authenticate failed: Authentication failure",
     "We trust you have received the usual lecture from the local System",
     "Administrator. It usually boils down to these three things:",

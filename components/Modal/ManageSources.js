@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable react/no-did-update-set-state */
 
@@ -5,7 +6,8 @@ import React from "react";
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { FormattedMessage, defineMessages, injectIntl, intlShape } from "react-intl";
-import { Modal, Alert, Spinner } from "patternfly-react";
+import { Alert, Spinner } from "patternfly-react";
+import { Modal, ModalVariant, Title } from "@patternfly/react-core";
 import SourcesListItem from "../ListView/SourcesListItem";
 import EmptyState from "../EmptyState/EmptyState";
 import {
@@ -159,7 +161,7 @@ class ManageSourcesModal extends React.Component {
     }
   }
 
-  handleShowForm(e, showForm) {
+  handleShowForm(ev, showForm) {
     this.setState({ addEntry: showForm });
     if (showForm) {
       this.setState({
@@ -177,14 +179,15 @@ class ManageSourcesModal extends React.Component {
         warningDuplicateUrl: false,
       });
     }
+    ev.preventDefault();
   }
 
-  handleChange(e, input) {
+  handleChange(ev, input) {
     let value;
     if (input === "check_ssl" || input === "check_gpg") {
-      value = e.target.checked;
+      value = ev.target.checked;
     } else {
-      value = e.target.value.trim();
+      value = ev.target.value.trim();
     }
     if (input === "name") {
       this.handleValidateName(value);
@@ -193,6 +196,7 @@ class ManageSourcesModal extends React.Component {
       this.handleValidateUrl(value);
     }
     this.setState({ [input]: value });
+    ev.preventDefault();
   }
 
   handleValidateName(name) {
@@ -217,7 +221,7 @@ class ManageSourcesModal extends React.Component {
     });
   }
 
-  handleSubmitSource() {
+  handleSubmitSource(ev) {
     this.props.clearError({});
     const source = {
       name: this.state.name,
@@ -227,6 +231,7 @@ class ManageSourcesModal extends React.Component {
       check_gpg: this.state.check_gpg,
     };
     this.props.addSource(source);
+    ev.preventDefault();
   }
 
   render() {
@@ -272,7 +277,7 @@ class ManageSourcesModal extends React.Component {
                 aria-invalid={this.state.warningDuplicateName}
                 readOnly={this.state.editName !== ""}
                 value={this.state.name}
-                onChange={(e) => this.handleChange(e, "name")}
+                onChange={(ev) => this.handleChange(ev, "name")}
               />
               {this.state.warningDuplicateName && (
                 <span className="help-block" id="textInput1-modal-source-help">
@@ -294,7 +299,7 @@ class ManageSourcesModal extends React.Component {
                 aria-required="true"
                 aria-invalid={this.state.warningDuplicateUrl}
                 value={this.state.url}
-                onChange={(e) => this.handleChange(e, "url")}
+                onChange={(ev) => this.handleChange(ev, "url")}
               />
               {this.state.warningDuplicateUrl && (
                 <span className="help-block" id="textInput2-modal-source-help">
@@ -313,7 +318,7 @@ class ManageSourcesModal extends React.Component {
                 className="form-control"
                 value={this.state.type}
                 aria-required="true"
-                onChange={(e) => this.handleChange(e, "type")}
+                onChange={(ev) => this.handleChange(ev, "type")}
               >
                 <option value="" disabled hidden>
                   {formatMessage(messages.selectOne)}
@@ -335,7 +340,7 @@ class ManageSourcesModal extends React.Component {
                     type="checkbox"
                     id="checkboxInput4-modal-source"
                     checked={this.state.check_ssl}
-                    onChange={(e) => this.handleChange(e, "check_ssl")}
+                    onChange={(ev) => this.handleChange(ev, "check_ssl")}
                   />
                   {formatMessage(messages.check_ssl)}
                 </label>
@@ -346,7 +351,7 @@ class ManageSourcesModal extends React.Component {
                     type="checkbox"
                     id="checkboxInput5-modal-source"
                     checked={this.state.check_gpg}
-                    onChange={(e) => this.handleChange(e, "check_gpg")}
+                    onChange={(ev) => this.handleChange(ev, "check_gpg")}
                   />
                   {formatMessage(messages.check_gpg)}
                 </label>
@@ -356,100 +361,109 @@ class ManageSourcesModal extends React.Component {
         </form>
       </>
     );
+
+    const header = (
+      <Title headingLevel="h2" size="3xl" id="title-manage-sources">
+        {(!this.state.addEntry && (
+          <FormattedMessage
+            defaultMessage="Sources"
+            description="Sources provide the contents from which components are selected"
+          />
+        )) ||
+          (this.state.editName === "" && <FormattedMessage defaultMessage="Add source" />) || (
+            <FormattedMessage defaultMessage="Edit source" />
+          )}
+      </Title>
+    );
+
+    const body = (
+      <>
+        {(Object.keys(manageSources.sources).length === 0 && (
+          <EmptyState
+            title={formatMessage(messages.errorStateTitle)}
+            message={formatMessage(messages.errorStateMessage)}
+          />
+        )) || (
+          <>
+            {(!this.state.addEntry && (
+              <>
+                <div className="cmpsr-header cmpsr-header--modal">
+                  <div className="cmpsr-header__actions">
+                    <input
+                      type="button"
+                      autoFocus={this.state.editName === ""}
+                      className="btn btn-primary pull-right"
+                      onClick={(ev) => this.handleShowForm(ev, true)}
+                      value={formatMessage(messages.add)}
+                    />
+                  </div>
+                </div>
+                <div className="list-pf cmpsr-list-pf list-pf-stacked cmpsr-list-sources">
+                  {systemSources.map((source) => (
+                    <SourcesListItem source={source} key={source.name} />
+                  ))}
+                  {customSources.length > 0 &&
+                    customSources.map((source) => (
+                      <SourcesListItem
+                        source={source}
+                        key={source.name}
+                        edited={this.state.editName}
+                        fetching={manageSources.fetchingSources}
+                        edit={this.handleEditSource}
+                        remove={this.props.removeSource}
+                      />
+                    ))}
+                </div>
+              </>
+            )) ||
+              manageSourcesForm}
+          </>
+        )}
+      </>
+    );
+
+    const footer = (
+      <>
+        {(!this.state.addEntry && (
+          <button type="button" className="btn btn-default" onClick={this.props.close}>
+            <FormattedMessage defaultMessage="Close" />
+          </button>
+        )) || (
+          <>
+            {manageSources.fetchingSources && (
+              <div className="pull-left">
+                <Spinner loading size="xs" inline />
+                <FormattedMessage defaultMessage="Saving source" />
+              </div>
+            )}
+            <button type="button" className="btn btn-default" onClick={(ev) => this.handleShowForm(ev, false)}>
+              {formatMessage(messages.cancel)}
+            </button>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              form="cmpsr-form-add-source"
+              disabled={disabledSubmit}
+              onClick={(ev) => this.handleSubmitSource(ev)}
+            >
+              {(this.state.editName === "" && formatMessage(messages.save)) || formatMessage(messages.update)}
+            </button>
+          </>
+        )}
+      </>
+    );
+
     return (
       <Modal
-        show
+        isOpen
+        variant={ModalVariant.medium}
         id="cmpsr-modal-manage-sources"
-        onHide={this.props.close}
-        bsSize="large"
+        header={header}
+        onClose={this.props.close}
+        footer={footer}
         aria-labelledby="title-manage-sources"
       >
-        <Modal.Header>
-          <Modal.CloseButton onClick={this.props.close} />
-          <Modal.Title id="title-manage-sources">
-            {(!this.state.addEntry && (
-              <FormattedMessage
-                defaultMessage="Sources"
-                description="Sources provide the contents from which components are selected"
-              />
-            )) ||
-              (this.state.editName === "" && <FormattedMessage defaultMessage="Add source" />) || (
-                <FormattedMessage defaultMessage="Edit source" />
-              )}
-          </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {(Object.keys(manageSources.sources).length === 0 && (
-            <EmptyState
-              title={formatMessage(messages.errorStateTitle)}
-              message={formatMessage(messages.errorStateMessage)}
-            />
-          )) || (
-            <>
-              {(!this.state.addEntry && (
-                <>
-                  <div className="cmpsr-header cmpsr-header--modal">
-                    <div className="cmpsr-header__actions">
-                      <input
-                        type="button"
-                        autoFocus={this.state.editName === ""}
-                        className="btn btn-primary pull-right"
-                        onClick={(e) => this.handleShowForm(e, true)}
-                        value={formatMessage(messages.add)}
-                      />
-                    </div>
-                  </div>
-                  <div className="list-pf cmpsr-list-pf list-pf-stacked cmpsr-list-sources">
-                    {systemSources.map((source) => (
-                      <SourcesListItem source={source} key={source.name} />
-                    ))}
-                    {customSources.length > 0 &&
-                      customSources.map((source) => (
-                        <SourcesListItem
-                          source={source}
-                          key={source.name}
-                          edited={this.state.editName}
-                          fetching={manageSources.fetchingSources}
-                          edit={this.handleEditSource}
-                          remove={this.props.removeSource}
-                        />
-                      ))}
-                  </div>
-                </>
-              )) ||
-                manageSourcesForm}
-            </>
-          )}
-        </Modal.Body>
-        <Modal.Footer>
-          {(!this.state.addEntry && (
-            <button type="button" className="btn btn-default" onClick={this.props.close}>
-              <FormattedMessage defaultMessage="Close" />
-            </button>
-          )) || (
-            <>
-              {manageSources.fetchingSources && (
-                <div className="pull-left">
-                  <Spinner loading size="xs" inline />
-                  <FormattedMessage defaultMessage="Saving source" />
-                </div>
-              )}
-              <button type="button" className="btn btn-default" onClick={(e) => this.handleShowForm(e, false)}>
-                {formatMessage(messages.cancel)}
-              </button>
-
-              <button
-                type="submit"
-                className="btn btn-primary"
-                form="cmpsr-form-add-source"
-                disabled={disabledSubmit}
-                onClick={() => this.handleSubmitSource()}
-              >
-                {(this.state.editName === "" && formatMessage(messages.save)) || formatMessage(messages.update)}
-              </button>
-            </>
-          )}
-        </Modal.Footer>
+        {body}
       </Modal>
     );
   }

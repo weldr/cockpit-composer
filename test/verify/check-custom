@@ -6,7 +6,6 @@
 # 3. hostname setting
 # 4. user setting
 
-import crypt
 import re
 
 import composerlib
@@ -149,7 +148,6 @@ class TestCustom(composerlib.ComposerCase):
 
     def testUserAccount(self):
         b = self.browser
-        m = self.machine
 
         # HACK: cockpit-composer may loose keystrokes, see issue #944
         def set_input_value(sel, val):
@@ -170,9 +168,9 @@ class TestCustom(composerlib.ComposerCase):
         # add a new user
         b.click("button:contains('Create user account')")
         b.wait_visible("#cmpsr-modal-user-account")
-        set_input_value("#textInput2-modal-user", "x y")
-        b.wait_val("#textInput1-modal-user", "xy")
-        b.click("input[type=checkbox]")
+        set_input_value("#textInput2-modal-user", "user")
+        b.wait_val("#textInput1-modal-user", "user")
+        b.click("input[aria-label='Server admin checkbox']")
         set_input_value("#textInput1-modal-password", "fooBAR!@#123")
         set_input_value("#textInput2-modal-password", "fooBAR!@#123")
         ssh_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDUOtNJdBEXyKxBB898rdT54ULjMGuO6v4" \
@@ -184,28 +182,15 @@ class TestCustom(composerlib.ComposerCase):
         b.set_input_text("#textInput5-modal-user", ssh_key)
         b.click("#cmpsr-modal-user-account button:contains('Create')")
         b.wait_not_present("#cmpsr-modal-user-account")
-        b.wait_text("tr td[data-label='Full name']", "x y")
-        b.wait_text("tr td[data-label='User name']", "xy")
+        b.wait_text("tr td[data-label='Full name']", "user")
+        b.wait_text("tr td[data-label='User name']", "user")
         b.wait_visible("tr td[data-label='Server administrator'] .fa-check")
-        b.wait_visible("tr td[data-label=Password] .fa-check")
-        b.wait_in_text("tr td[data-label='SSH key']", "cockpit-test")
-
-        # check backend to have correct password configured
-        passwd_str = m.execute("""
-            composer-cli blueprints show openssh-server | grep password | awk -F '"' '{print $2}'
-            """).rstrip()
-        salt = passwd_str[:passwd_str.rfind("$")]
-        passwd_crypt = crypt.crypt("fooBAR!@#123", salt)
-        self.assertEqual(passwd_str, passwd_crypt)
-        # check backend to have correct ssh key configured
-        ssh_key_backend = m.execute("""
-            composer-cli blueprints show openssh-server | grep key | awk -F '"' '{print $2}'
-            """).rstrip()
-        self.assertEqual(ssh_key_backend, ssh_key)
+        b.wait_visible("tr td[data-label='Password'] .fa-check")
+        b.wait_visible("tr td[data-label='SSH key'] .fa-check")
 
         # update password
         new_password = "c456rty$%^RTY"
-        b.click("button[aria-label='Edit user account xy']")
+        b.click("button[aria-label='Edit user account user']")
         b.wait_visible("#cmpsr-modal-user-account")
         b.click("button:contains('Set new password')")
         set_input_value("#textInput1-modal-password", new_password)
@@ -213,27 +198,20 @@ class TestCustom(composerlib.ComposerCase):
         b.click("#cmpsr-modal-user-account button:contains('Update')")
         b.wait_not_present("#cmpsr-modal-user-account")
         b.wait_visible("tr td[data-label=Password] .fa-check")
-        passwd_str = m.execute("""
-            composer-cli blueprints show openssh-server | grep password | awk '{print $3}'
-            """).strip('"\n')
-        salt = passwd_str[:passwd_str.rfind("$")]
-        passwd_crypt = crypt.crypt(new_password, salt)
-        self.assertEqual(passwd_str, passwd_crypt)
 
         # remove password
-        b.click("button[aria-label='Edit user account xy']")
+        b.click("button[aria-label='Edit user account user']")
         b.wait_visible("#cmpsr-modal-user-account")
         b.click("button:contains('Remove password')")
         b.click("#cmpsr-modal-user-account button:contains('Update')")
         b.wait_not_present("#cmpsr-modal-user-account")
-        b.wait_visible("tr td[data-label=Password]")
-        b.wait_not_present("tr td[data-label=Password] .fa-check")
+        b.wait_visible("table[aria-label='Users List']")
+        b.wait_not_present("tr td[data-label='Password'] .fa-check")
 
         # duplicated user
         b.click("button:contains('Create user account')")
         b.wait_visible("#cmpsr-modal-user-account")
-        set_input_value("#textInput2-modal-user", "x y")
-        b.wait_val("#textInput1-modal-user", "xy")
+        set_input_value("#textInput2-modal-user", "user")
         b.wait_in_text("#textInput1-modal-user-help1", "This user name already exists.")
         b.click("#cmpsr-modal-user-account button:contains('Cancel')")
         b.wait_not_present("#cmpsr-modal-user-account")
@@ -242,21 +220,20 @@ class TestCustom(composerlib.ComposerCase):
         b.click("button:contains('Create user account')")
         b.wait_visible("#cmpsr-modal-user-account")
         set_input_value("#textInput2-modal-user", "admin user")
-        b.wait_val("#textInput1-modal-user", "auser")
-        b.click("input[type=checkbox]")
+        b.click("input[aria-label='Server admin checkbox']")
         set_input_value("#textInput1-modal-password", "aaa")
         set_input_value("#textInput2-modal-password", "bbb")
         b.wait_in_text("#textInput2-modal-password-help",
                        "The values entered for password do not match.")
-        b.click("#cmpsr-modal-user-account .close")
+        b.click("#cmpsr-modal-user-account button:contains('Cancel')")
         b.wait_not_present("#cmpsr-modal-user-account")
 
         # delete user
-        delete_drop_down_sel = "button[aria-label='User account actions xy']"
+        delete_drop_down_sel = "button[aria-label='User account actions user']"
         b.click(delete_drop_down_sel)
         b.wait_attr(delete_drop_down_sel, "aria-expanded", "true")
         b.click("a:contains('Delete user account')")
-        b.wait_not_present("table")
+        b.wait_not_present("table[aria-label='Users List']")
 
         # collect code coverage result
         self.check_coverage()
